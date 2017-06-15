@@ -1,4 +1,4 @@
 ---
 
-- include: wn-config.yml
+- include: cvmfs-config.yml
 - include: start-ams-apps.yml
