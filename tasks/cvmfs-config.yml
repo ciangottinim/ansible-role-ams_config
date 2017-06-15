@@ -40,8 +40,16 @@
   file: path=/cvmfs/sft.cern.ch state=directory owner=cvmfs group=cvmfs recurse=yes
   tags: ams_config
 
-- name: mount CVMFS
-  command: mount -t cvmfs ams.cern.ch /cvmfs/ams.cern.ch/ && mount -t cvmfs sft.cern.ch /cvmfs/sft.cern.ch/
+- name: mount CVMFS1
+  command: mount -t cvmfs ams.cern.ch /cvmfs/ams.cern.ch/
+  register: result
+  until: result | success
+  retries: 10
+  delay: 10
+  tags: ams_config
+
+- name: mount CVMFS2
+  command: mount -t cvmfs sft.cern.ch /cvmfs/sft.cern.ch/
   register: result
   until: result | success
   retries: 10
