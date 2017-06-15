@@ -1,7 +1,7 @@
 galaxy_info:
-  author: marica.antonacci@gmail.com
-  description: "Configure host for CMS: configure CVMFS,  ENV Variables,  TFC, Proxy, etc."
-  company: INDIGO-DataCloud
+  author: manuel.ciangottini@gmail.com
+  description: "Configure host for AMS: configure CVMFS,  ENV Variables, etc."
+  company: INFN-PG
   license: Apache
   min_ansible_version: 2.0
   platforms:
@@ -9,7 +9,7 @@ galaxy_info:
     versions:
     - trusty
   galaxy_tags: 
-   - cms
+   - ams
    - cvmfs
 
-dependencies: [] 
+dependencies: []

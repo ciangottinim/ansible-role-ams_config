@@ -1,95 +1,15 @@
 ---
 
-- name: start CMS squid
-  run_once: true
-  uri: 
-     url: "https://marathon.service.consul:{{marathon_https_port}}/v2/apps/cmssquid"
-     user: "{{marathon_username}}"
-     password: "{{marathon_password}}"
-     validate_certs: "no"
-     method: PUT
-     HEADER_Content-Type: "application/json"
-     body: "{{ lookup('template', 'templates/cmssquid-app.json') }}"
-     body_format: json
-  register: result
-  until: result.status == 200
-  retries: 10
-  delay: 20
-  changed_when: false
-  tags:
-    - cms_apps
-
-- name: wait for cms squid to be up and running (ansible > 2.1.0.0)
-  wait_for: 
-     host: "{{cms_config_mysquid_host}}" 
-     port: "{{cms_config_mysquid_port}}"
-     delay: 20
-     timeout: 600
-     connect_timeout: 10
-  when: ansible_version > "2.1.0.0"
-  tags:
-    - cms_apps
-
-- name: wait for cms squid to be up and running using nc
-  command: nc -z {{cms_config_mysquid_host}} {{cms_config_mysquid_port}}
-  register: result
-  until: result.rc == 0
-  delay: 20
-  retries: 20
-  when: ansible_version <= "2.1.0.0"
-  tags:
-    - cms_apps
-
-- name: start CMS proxy cache
-  run_once: true
-  uri: 
-     url: "https://marathon.service.consul:{{marathon_https_port}}/v2/apps/certcache"
-     user: "{{marathon_username}}"
-     password: "{{marathon_password}}"
-     validate_certs: "no"
-     method: PUT
-     HEADER_Content-Type: "application/json"
-     body: "{{ lookup('template', 'templates/cmsproxycache-app.json') }}"
-     body_format: json
-  register: result
-  until: result.status == 200
-  retries: 10
-  delay: 20
-  changed_when: false
-  tags:
-    - cms_apps
-
-- name: wait for cms proxy cache service to be up and running (ansible > 2.1.0.0)
-  wait_for:
-     host: "{{cms_config_proxycache_host}}"
-     port: "{{cms_config_proxycache_serviceport}}"
-     delay: 20
-     timeout: 600
-     connect_timeout: 10
-  when: ansible_version > "2.1.0.0"
-  tags:
-    - cms_apps
-
-- name: wait for cms proxy cache service to be up and running using nc
-  command: nc -z {{cms_config_proxycache_host}} {{cms_config_proxycache_serviceport}}
-  register: result
-  until: result.rc == 0
-  delay: 20
-  retries: 20
-  when: ansible_version <= "2.1.0.0"
-  tags:
-    - cms_apps
-
-- name: start CMS WN
+- name: start AMS Central Manager
   run_once: true
   uri:
-     url: "https://marathon.service.consul:{{marathon_https_port}}/v2/apps/cmswn"
+     url: "https://marathon.service.consul:{{marathon_https_port}}/v2/apps/amscm"
      user: "{{marathon_username}}"
      password: "{{marathon_password}}"
      validate_certs: "no"
      method: PUT
      HEADER_Content-Type: "application/json"
-     body: "{{ lookup('template', 'templates/cmswn-app.json') }}"
+     body: "{{ lookup('template', 'templates/amscm.json') }}"
      body_format: json
   register: result
   until: result.status == 200
@@ -97,4 +17,42 @@
   delay: 20
   changed_when: false
   tags:
-    - cms_apps
+    - ams_apps
+
+- name: start AMS Schedd
+  run_once: true
+  uri:
+     url: "https://marathon.service.consul:{{marathon_https_port}}/v2/apps/amsschedd"
+     user: "{{marathon_username}}"
+     password: "{{marathon_password}}"
+     validate_certs: "no"
+     method: PUT
+     HEADER_Content-Type: "application/json"
+     body: "{{ lookup('template', 'templates/amsschedd.json') }}"
+     body_format: json
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 20
+  changed_when: false
+  tags:
+    - ams_apps
+
+- name: start AMS WN
+  run_once: true
+  uri:
+     url: "https://marathon.service.consul:{{marathon_https_port}}/v2/apps/amswn"
+     user: "{{marathon_username}}"
+     password: "{{marathon_password}}"
+     validate_certs: "no"
+     method: PUT
+     HEADER_Content-Type: "application/json"
+     body: "{{ lookup('template', 'templates/amswn.json') }}"
+     body_format: json
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 20
+  changed_when: false
+  tags:
+    - ams_apps

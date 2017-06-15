@@ -35,42 +35,27 @@
   lineinfile: dest=/etc/fuse.conf line="user_allow_other" state=present
   tags: cms_config
 
-- name: wait for cms squid to be up and running (ansible > 2.1.0.0)
-  wait_for: 
-     host: "{{cms_config_mysquid_host}}" 
-     port: "{{cms_config_mysquid_port}}"
-     delay: 20
-     timeout: 600
-  when: ansible_version > "2.1.0.0"
-  tags:
-    - cms_config
-
-- name: wait for cms squid to be up and running using nc 
-  command: nc -z {{cms_config_mysquid_host}} {{cms_config_mysquid_port}}
-  register: result
-  until: result.rc == 0
-  delay: 20
-  retries: 40
-  when: ansible_version <= "2.1.0.0"
-  tags:
-    - cms_apps
-
 - name: Stop autofs
   service: name=autofs state=stopped
   tags: cms_config
 
-- name: Creates CVMFS mountpoint
-  file: path=/cvmfs/cms.cern.ch state=directory owner=cvmfs group=cvmfs recurse=yes
+- name: Creates CVMFS mountpoint1
+  file: path=/cvmfs/ams.cern.ch state=directory owner=cvmfs group=cvmfs recurse=yes
+  tags: cms_config
+
+- name: Creates CVMFS mountpoint2
+  file: path=/cvmfs/sft.cern.ch state=directory owner=cvmfs group=cvmfs recurse=yes
   tags: cms_config
 
 - name: mount CVMFS
-  command: mount -t cvmfs cms.cern.ch /cvmfs/cms.cern.ch/
+  command: mount -t cvmfs ams.cern.ch /cvmfs/ams.cern.ch/ && mount -t cvmfs sft.cern.ch /cvmfs/sft.cern.ch/
   register: result
   until: result | success
   retries: 10
   delay: 10
   tags: cms_config
 
+###############################
 - name: Set wide-system environment vars
   blockinfile:
     dest: /etc/environment
@@ -83,132 +68,50 @@
       STAGEOUTPREFIX={{cms_config_stageoutprefix}}
   tags: cms_config
 
-- name: copy the content of T3_IT_Opportunistic into /opt/exp_sw/cms/
-  shell: cp -r -u /cvmfs/cms.cern.ch/SITECONF/T3_IT_Opportunistic/* /opt/exp_sw/cms/
-  tags: cms_config
-
-- name: clearing content /opt/exp_sw/cms/JobConfig/site-local-config.xml
-  shell: cp /dev/null /opt/exp_sw/cms/JobConfig/site-local-config.xml
-  tags: cms_config
-
-- name: clearing content /opt/exp_sw/cms/PhEDEx/storage.xml
-  shell: cp /dev/null /opt/exp_sw/cms/PhEDEx/storage.xml
-  tags: cms_config
-
-- name: inserting custom site-local-config.xml
-  blockinfile:
-    name: /opt/exp_sw/cms/JobConfig/site-local-config.xml
-    marker: "<!-- {mark} Creating local TFC -->"
-    block: |
-      <site-local-config>
-      <site name="{{cms_config_cms_local_site}}">
-      <event-data>
-      <catalog url="trivialcatalog_file:/cvmfs/cms.cern.ch/SITECONF/local/PhEDEx/storage.xml?protocol=xrootd"/>
-      </event-data>
-      <source-config>
-      <statistics-destination name="cms-udpmon-collector.cern.ch:9331" />
-      </source-config>
-      <calib-data>
-      <frontier-connect>
-      <load balance="proxies"/>
-      <proxy url="http://cmssquid.pi.infn.it:3128"/>
-      <proxy url="http://cmssquid2.pi.infn.it:3128"/>
-      <backupproxy url="http://cmsbpfrontier.cern.ch:3128"/>
-      <backupproxy url="http://cmsbproxy.fnal.gov:3128"/>
-      <server url="http://cmsfrontier.cern.ch:8000/FrontierInt"/>
-      <server url="http://cmsfrontier1.cern.ch:8000/FrontierInt"/>
-      <server url="http://cmsfrontier2.cern.ch:8000/FrontierInt"/>
-      <server url="http://cmsfrontier3.cern.ch:8000/FrontierInt"/>
-      </frontier-connect>
-      </calib-data>
-      <local-stage-out>
-      <command value="srmv2-lcg"/>
-      <option value="-v --connect-timeout 240"/>
-      <catalog url="trivialcatalog_file:/cvmfs/cms.cern.ch/SITECONF/local/PhEDEx/storage.xml?protocol=srmv2"/>
-      <se-name value="{{cms_config_stageoutserver}}"/>
-      <phedex-node value="{{cms_config_stageoutsite}}"/>
-      </local-stage-out>
-      <fallback-stage-out>
-      <se-name value="{{cms_config_stageoutserver_fallback}}"/>
-      <phedex-node value="{{cms_config_stageoutsite_fallback}}"/>
-      <lfn-prefix value="{{cms_config_stageoutprefix_fallback}}"/>
-      <command value="srmv2-lcg"/>
-      <option value="-v "/>
-      </fallback-stage-out>
-      </site>
-      </site-local-config>
-  tags: cms_config
-
-- name: inserting custom storage.xml
-  blockinfile:
-    name: /opt/exp_sw/cms/PhEDEx/storage.xml
-    marker: "<!-- {mark} Creating local storage.xml -->"
-    block: |
-      <storage-mapping>
-
-      <lfn-to-pfn protocol="srmv2" destination-match=".*"
-      path-match="/+store/(.*)"   result="{{cms_config_stageoutprefix}}/store/$1"/>
-
-
-      <!-- PFN TO LFN -->
-
-      <pfn-to-lfn protocol="dcap" destination-match=".*" path-match=".*gpfs/ddn/srm/cms/(.*)" result="/$1"/>
-
-      <pfn-to-lfn protocol="srmv2" destination-match=".*"  path-match=".*\?SFN=/cms/(.*)" result="/$1"/>
-
-      <pfn-to-lfn protocol="srm" destination-match=".*"  path-match=".*\?SFN=/cms/(.*)" result="/$1"/>
-
-      <!-- FALLBACK SU PISA XROOTD -->
-      <lfn-to-pfn protocol="xrootd" path-match="/+store/(.*)" result="root://xrootd-cms.infn.it:1194//store/$1"/>
-      <pfn-to-lfn protocol="xrootd" destination-match=".*" path-match="root://xrootd-cms.infn.it:1194//store/(.*)" result="/store/$1"/>
-
-      </storage-mapping>
-  tags: cms_config
-
-- name: Get metricbeat
-  get_url:
-    url: https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-5.2.2-amd64.deb
-    dest: /tmp/metricbeat.deb
-  tags: metric_install
-
-- name: Install metricbeat
-  command: dpkg -i /tmp/metricbeat.deb
-  tags: metric_install
-
-- name: Get metricbeat config
-  get_url:
-    url: https://gist.githubusercontent.com/dciangot/69b61ff2bb1327b6485af88ac06c71ff/raw/
-    dest: /etc/metricbeat/metricbeat.yml
-    force: yes
-  tags: metric_install
-
-- name: Configure elasticsearch endpoint
-  replace:
-    dest: /etc/metricbeat/metricbeat.yml
-    regexp: '(hosts: )\[\]$'
-    replace: '\1 ["{{monitordb_ip}}"]'
-    backup: yes
-  tags: metric_install
-
-- name: Set metric name
-  replace:
-    dest: /etc/metricbeat/metricbeat.yml
-    regexp: '.*(name:)$'
-    replace: '\1 {{ cms_config_cms_local_site }}'
-    backup: yes
-  tags: metric_install
-
-- name: Set elasticsearch password
-  replace:
-    dest: /etc/metricbeat/metricbeat.yml
-    regexp: '(password:)$'
-    replace: '\1 "{{ cms_config_elastic_secret }}"'
-    backup: yes
-  tags: metric_install
-
-- name: Start metricbeat
-  service:
-    name: metricbeat
-    state: started
-  tags: metric_start
+#- name: Get metricbeat
+#  get_url:
+#    url: https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-5.2.2-amd64.deb
+#    dest: /tmp/metricbeat.deb
+#  tags: metric_install
+#
+#- name: Install metricbeat
+#  command: dpkg -i /tmp/metricbeat.deb
+#  tags: metric_install
+#
+#- name: Get metricbeat config
+#  get_url:
+#    url: https://gist.githubusercontent.com/dciangot/69b61ff2bb1327b6485af88ac06c71ff/raw/
+#    dest: /etc/metricbeat/metricbeat.yml
+#    force: yes
+#  tags: metric_install
+#
+#- name: Configure elasticsearch endpoint
+#  replace:
+#    dest: /etc/metricbeat/metricbeat.yml
+#    regexp: '(hosts: )\[\]$'
+#    replace: '\1 ["{{monitordb_ip}}"]'
+#    backup: yes
+#  tags: metric_install
+#
+#- name: Set metric name
+#  replace:
+#    dest: /etc/metricbeat/metricbeat.yml
+#    regexp: '.*(name:)$'
+#    replace: '\1 {{ cms_config_cms_local_site }}'
+#    backup: yes
+#  tags: metric_install
+#
+#- name: Set elasticsearch password
+#  replace:
+#    dest: /etc/metricbeat/metricbeat.yml
+#    regexp: '(password:)$'
+#    replace: '\1 "{{ cms_config_elastic_secret }}"'
+#    backup: yes
+#  tags: metric_install
+#
+#- name: Start metricbeat
+#  service:
+#    name: metricbeat
+#    state: started
+#  tags: metric_start
 

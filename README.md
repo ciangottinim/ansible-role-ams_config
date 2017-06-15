@@ -54,6 +54,4 @@ Apache Licence v2 [1]
 Author Information
 ------------------
 
-marica.antonacci@ba.infn.it
-
-daniele.spiga@pg.infn.it
+manuel.ciangottini@pg.infn.it
