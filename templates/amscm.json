@@ -1,0 +1,14 @@
+{
+  "id": "htcondor-master-ams",
+  "args": ["-m"],
+  "cpus": 1,
+  "mem": 1024.0,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "{{ams_config_condor_image}}",
+      "network": "HOST"
+    }
+  },
+  "constraints": [["hostname", "CLUSTER", "mesos-condor-cm"]]
+}

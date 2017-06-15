@@ -1,0 +1,21 @@
+{
+  "id": "htcondor-submitter-ams",
+  "args": ["-s", "{{ams_config_cm_ip}}"],
+  "cpus": 1,
+  "mem": 2048.0,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "{{ams_config_condor_image}}",
+      "network": "HOST"
+    },
+    "volumes": [{
+        "containerPath": "/cvmfs",
+        "hostPath": "/cvmfs",
+        "mode": "RW"
+    }]
+  },
+  "env": {
+    "FRONTIER_PROXY": "{{ams_config_cm_ip}}"
+  }
+}

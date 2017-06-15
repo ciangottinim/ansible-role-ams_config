@@ -1,0 +1,20 @@
+{
+  "id": "htcondor-executor-ams",
+  "args": ["-e", "{{ams_config_cm_ip}}"],
+  "cpus": 1,
+  "mem": 1024.0,
+  "instances": 3,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "{{ams_config_condor_image}}",
+      "privileged": true,
+      "network": "BRIDGE"
+    },
+    "volumes": [{
+        "containerPath": "/cvmfs",
+        "hostPath": "/cvmfs",
+        "mode": "RW"
+    }]
+  }
+}

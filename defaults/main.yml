@@ -9,10 +9,9 @@
 #cms_config_iamtoken: MANDATORY - NO DEFAULT AVAILABLE
 ####
 
-cms_config_cvmfs_http_proxy: "http://{{cms_config_mysquid_host}}:{{cms_config_mysquid_port}}"
-cms_config_cvmfs_repositories: "ams"
+#ams_config_cm_ip: MANDATORY - NO DEFAULT AVAILABLE
 
-cms_config_manager_image: ""
-cms_config_schedd_image: ""
-cms_config_wn_image: ""
+ams_config_cvmfs_http_proxy: "http://{{ams_config_squid_host}}:{{ams_config_squid_port}}"
+ams_config_cvmfs_repositories: "ams"
 
+ams_config_condor_image: "ciangom/htcondor-docker-debian:ams"

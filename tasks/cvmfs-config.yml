@@ -2,50 +2,43 @@
 # tasks file for cms_config
 - name: install cvmfs repo
   apt: deb=https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
-  tags: cms_config
+  tags: ams_config
 
 - name: Install cvmfs packages
   apt: name={{item}} state=present update_cache=yes
   with_items:
        - cvmfs
        - cvmfs-config-default
-  tags: cms_config
+  tags: ams_config
 
 - name: create/update file /etc/cvmfs/default.local
   blockinfile:
     dest: /etc/cvmfs/default.local
     create: yes
     content: |
-      CVMFS_HTTP_PROXY={{cms_config_cvmfs_http_proxy}}
-      CVMFS_REPOSITORIES={{cms_config_cvmfs_repositories}}
-  tags: cms_config
+      CVMFS_HTTP_PROXY={{ams_config_cvmfs_http_proxy}}
+      CVMFS_REPOSITORIES={{ams_config_cvmfs_repositories}}
+  tags: ams_config
 
-
-- name: create necessary dirs
-  file:  path={{item}} state=directory mode=0755
-  with_items:
-    - /opt/exp_sw/cms
-  tags: cms_config
-
-- name: set CMS_LOCAL_SITE variable
-  lineinfile: dest=/etc/cvmfs/config.d/cms.cern.ch.conf create=yes line="export CMS_LOCAL_SITE=/opt/exp_sw/cms"  
-  tags: cms_config
+- name: set AMS_SERVER_URL variable
+  lineinfile: dest=/etc/cvmfs/config.d/ams.cern.ch.local create=yes line="CVMFS_SERVER_URL=\"http://cvmfs-stratum-one.cern.ch/opt/@org@\""  
+  tags: ams_config
 
 - name: Enable user_allow_other in fuse.conf
   lineinfile: dest=/etc/fuse.conf line="user_allow_other" state=present
-  tags: cms_config
+  tags: ams_config
 
 - name: Stop autofs
   service: name=autofs state=stopped
-  tags: cms_config
+  tags: ams_config
 
 - name: Creates CVMFS mountpoint1
   file: path=/cvmfs/ams.cern.ch state=directory owner=cvmfs group=cvmfs recurse=yes
-  tags: cms_config
+  tags: ams_config
 
 - name: Creates CVMFS mountpoint2
   file: path=/cvmfs/sft.cern.ch state=directory owner=cvmfs group=cvmfs recurse=yes
-  tags: cms_config
+  tags: ams_config
 
 - name: mount CVMFS
   command: mount -t cvmfs ams.cern.ch /cvmfs/ams.cern.ch/ && mount -t cvmfs sft.cern.ch /cvmfs/sft.cern.ch/
@@ -53,20 +46,17 @@
   until: result | success
   retries: 10
   delay: 10
-  tags: cms_config
+  tags: ams_config
 
 ###############################
-- name: Set wide-system environment vars
-  blockinfile:
-    dest: /etc/environment
-    create: yes
-    content: |
-      CMS_LOCAL_SITE={{cms_config_cms_local_site}}
-      MYSQUID={{cms_config_mysquid}}
-      STAGEOUTSITE={{cms_config_stageoutsite}}
-      STAGEOUTSERVER={{cms_config_stageoutserver}}
-      STAGEOUTPREFIX={{cms_config_stageoutprefix}}
-  tags: cms_config
+#- name: Set wide-system environment vars
+#  blockinfile:
+#    dest: /etc/environment
+#    create: yes
+#    content: |
+#      CMS_LOCAL_SITE={{cms_config_cms_local_site}}
+#      MYSQUID={{cms_config_mysquid}}
+#  tags: cms_config
 
 #- name: Get metricbeat
 #  get_url:
