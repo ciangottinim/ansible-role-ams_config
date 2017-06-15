@@ -10,5 +10,8 @@
       "network": "HOST"
     }
   },
-  "constraints": [["hostname", "CLUSTER", "mesos-condor-cm"]]
+  "constraints": [
+    ["hostname", "UNIQUE"],
+    ["hostname", "LIKE", "{{ams_config_cm_ip}}"]
+  ]
 }
