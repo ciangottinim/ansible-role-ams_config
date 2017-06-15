@@ -1,0 +1,6 @@
+---
+
+- include: wn-config.yml
+  when: (cms_config_node is defined) and (cms_config_node == "wn")
+- include: start-cms-apps.yml
+  when: cms_config_node is undefined 
