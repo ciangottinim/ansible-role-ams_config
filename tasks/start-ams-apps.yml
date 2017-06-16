@@ -19,6 +19,17 @@
   tags:
     - ams_apps
 
+- name: wait for central manager to be up
+  wait_for: 
+     host: "{{ams_config_cm_ip}}" 
+     port: 9618
+     delay: 20
+     timeout: 600
+     connect_timeout: 10
+  when: ansible_version > "2.1.0.0"
+  tags:
+    - ams_apps
+
 - name: start AMS Schedd
   run_once: true
   uri:
@@ -37,6 +48,10 @@
   changed_when: false
   tags:
     - ams_apps
+
+- name: wait for schedd
+  wait_for:
+    timeout: 120
 
 - name: start AMS WN
   run_once: true
