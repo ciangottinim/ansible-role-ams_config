@@ -1,6 +1,6 @@
 {
   "id": "htcondor-master-ams",
-  "args": ["-m"],
+  "args": ["-m", "{{ams_config_cm_ip}}"],
   "cpus": 1,
   "mem": 1024.0,
   "container": {

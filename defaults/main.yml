@@ -10,6 +10,7 @@
 ####
 
 #ams_config_cm_ip: MANDATORY - NO DEFAULT AVAILABLE
+#ams_config_schedd_ip: MANDATORY - NO DEFAULT AVAILABLE
 
 ams_config_cvmfs_http_proxy: "http://{{ams_config_squid_host}}:{{ams_config_squid_port}}"
 ams_config_cvmfs_repositories: "ams"
