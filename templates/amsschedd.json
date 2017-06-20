@@ -1,7 +1,7 @@
 {
   "id": "htcondor-submitter-ams",
   "args": ["-s", "{{ams_config_cm_ip}}", "-I", "{{ams_config_schedd_ip}}"],
-  "cpus": 1,
+  "cpus": 4,
   "mem": 2048.0,
   "container": {
     "type": "DOCKER",
