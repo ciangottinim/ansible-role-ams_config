@@ -21,7 +21,7 @@
 
 - name: wait for central manager
   wait_for: 
-     timeout: 120
+     timeout: 240
 
 - name: start AMS Schedd
   run_once: true
@@ -44,7 +44,7 @@
 
 - name: wait for schedd
   wait_for:
-    timeout: 120
+    timeout: 180
 
 - name: start AMS WN
   run_once: true
