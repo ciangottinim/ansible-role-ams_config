@@ -7,6 +7,7 @@
     "type": "DOCKER",
     "docker": {
       "image": "{{ams_config_condor_image}}",
+      "privileged": true,
       "network": "HOST"
     },
     "volumes": [{
