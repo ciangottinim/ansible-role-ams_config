@@ -2,7 +2,7 @@
   "id": "htcondor-executor-ams",
   "args": ["-e", "{{ams_config_cm_ip}}"],
   "cpus": 1,
-  "mem": 1024.0,
+  "mem": 2000.0,
   "instances": 2,
   "container": {
     "type": "DOCKER",
