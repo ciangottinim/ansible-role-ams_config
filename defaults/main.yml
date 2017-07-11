@@ -15,4 +15,4 @@
 ams_config_cvmfs_http_proxy: "http://{{ams_config_squid_host}}:{{ams_config_squid_port}}"
 ams_config_cvmfs_repositories: "ams"
 
-ams_config_condor_image: "ciangom/htcondor-docker-debian:ams"
+ams_config_condor_image: "ciangom/htcondor-docker-debian:ams-centos"
