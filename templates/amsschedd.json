@@ -14,6 +14,10 @@
         "containerPath": "/cvmfs",
         "hostPath": "/cvmfs",
         "mode": "RW"
+    }, {
+        "containerPath": "/etc/ssh",
+        "hostPath": "/etc/ssh",
+        "mode": "RW"
     }]
   },
   "constraints": [
