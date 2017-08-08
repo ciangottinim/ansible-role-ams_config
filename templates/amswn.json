@@ -17,5 +17,9 @@
         "hostPath": "/cvmfs",
         "mode": "RW"
     }]
+  },
+  "env": {
+    "ONEDATA_ACCES_TOKEN": "{{ams_config_onedatatoken}}"
+    "AMS_ONEDATA_CACHE": "{{ams_config_onedatacache}}"
   }
 }
