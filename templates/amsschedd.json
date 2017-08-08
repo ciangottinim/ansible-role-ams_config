@@ -23,5 +23,9 @@
   "constraints": [
     ["hostname", "UNIQUE"],
     ["hostname", "LIKE", "{{ams_config_schedd_ip}}"]
-  ]
+  ],
+  "env": {
+    "ONEDATA_ACCES_TOKEN": "{{ams_config_onedatatoken}}",
+    "AMS_ONEDATA_CACHE": "{{ams_config_onedatacache}}"
+  }
 }
