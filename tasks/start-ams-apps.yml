@@ -3,59 +3,13 @@
 - name: start AMS Central Manager
   run_once: true
   uri:
-     url: "https://marathon.service.consul:8443/v2/apps/amscm"
+     url: "https://marathon.service.consul:8443/v2/groups/amscm"
      user: "{{marathon_username}}"
      password: "{{marathon_password}}"
      validate_certs: "no"
      method: PUT
      HEADER_Content-Type: "application/json"
-     body: "{{ lookup('template', 'templates/amscm.json') }}"
-     body_format: json
-  register: result
-  until: result.status == 200
-  retries: 10
-  delay: 20
-  changed_when: false
-  tags:
-    - ams_apps
-
-- name: wait for central manager
-  wait_for: 
-     timeout: 240
-
-- name: start AMS Schedd
-  run_once: true
-  uri:
-     url: "https://marathon.service.consul:8443/v2/apps/amsschedd"
-     user: "{{marathon_username}}"
-     password: "{{marathon_password}}"
-     validate_certs: "no"
-     method: PUT
-     HEADER_Content-Type: "application/json"
-     body: "{{ lookup('template', 'templates/amsschedd.json') }}"
-     body_format: json
-  register: result
-  until: result.status == 200
-  retries: 10
-  delay: 20
-  changed_when: false
-  tags:
-    - ams_apps
-
-- name: wait for schedd
-  wait_for:
-    timeout: 180
-
-- name: start AMS WN
-  run_once: true
-  uri:
-     url: "https://marathon.service.consul:8443/v2/apps/amswn"
-     user: "{{marathon_username}}"
-     password: "{{marathon_password}}"
-     validate_certs: "no"
-     method: PUT
-     HEADER_Content-Type: "application/json"
-     body: "{{ lookup('template', 'templates/amswn.json') }}"
+     body: "{{ lookup('template', 'templates/groups.json') }}"
      body_format: json
   register: result
   until: result.status == 200
